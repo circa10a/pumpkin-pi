@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  pi-blaster:
+    container_name: pi-blaster
+    restart: always
+    image: squat/pi-blaster
+    privileged: true
+    volumes:
+      - /dev/:/dev
+
+  pumpkin-pi:
+    container_name: pumpkin-pi
+    restart: always
+    image: circa10a/pumpkin-pi
+    privileged: true
+    volumes:
+      - /dev:/dev
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - pi-blaster
