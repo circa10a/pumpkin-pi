@@ -146,40 +146,40 @@ func main() {
 		// Reset motor back to center periodically
 		gobot.Every(pumpkinPiConfig.ServoCenterResetInterval, func() {
 			log.Debug("executing reset back to center scheduler function")
-			// If during configured hours
-			if pumpkinPiConfig.isDuringConfiguredHours(time.Now().Hour(), pumpkinPiConfig.MotionTimeStart, pumpkinPiConfig.MotionTimeEnd) {
-				log.Warn(time.Now().Hour(), pumpkinPiConfig.MotionTimeStart, pumpkinPiConfig.MotionTimeEnd)
-				log.Debug("current time is between motion times or motion times are disabled")
-				// Ensure pumpkin is not already moving from another event
-				if !pumpkinPiConfig.MovingLock {
-					pumpkinPiConfig.MovingLock = true
-					// If motor is in the right position
-					if currentPosition > pumpkinPiConfig.ServoCenter {
-						// Rotate motor left incrementally
-						for i := currentPosition; i >= pumpkinPiConfig.ServoCenter; i-- {
-							log.Debug("pumpkin currently set to right position. setting servo back to center position due to scheduler")
-							time.Sleep(pumpkinPiConfig.ServoRotateDelay)
-							err = servo.Move(i)
-							if err != nil {
-								log.Error(err)
-							}
+			// If pumpkin is already moving or in the center position, skip
+			if pumpkinPiConfig.MovingLock || currentPosition == pumpkinPiConfig.ServoCenter {
+				log.Debug("pumpkin currently moving or already at center position. skipping move back to center")
+				return
+			}
+			// Ensure pumpkin is not already moving from another event
+			if !pumpkinPiConfig.MovingLock {
+				pumpkinPiConfig.MovingLock = true
+				// If motor is in the right position
+				if currentPosition > pumpkinPiConfig.ServoCenter {
+					// Rotate motor left incrementally
+					for i := currentPosition; i >= pumpkinPiConfig.ServoCenter; i-- {
+						log.Debug("pumpkin currently set to right position. setting servo back to center position due to scheduler")
+						time.Sleep(pumpkinPiConfig.ServoRotateDelay)
+						err = servo.Move(i)
+						if err != nil {
+							log.Error(err)
 						}
 					}
-					// If motor is in the left position
-					if currentPosition < pumpkinPiConfig.ServoCenter {
-						// Rotate motor right incrementally
-						for i := currentPosition; i <= pumpkinPiConfig.ServoCenter; i++ {
-							log.Debug("pumpkin currently set to left position. setting servo back to center position due to scheduler")
-							time.Sleep(pumpkinPiConfig.ServoRotateDelay)
-							err = servo.Move(i)
-							if err != nil {
-								log.Error(err)
-							}
-						}
-					}
-					currentPosition = pumpkinPiConfig.ServoCenter
-					pumpkinPiConfig.MovingLock = false
 				}
+				// If motor is in the left position
+				if currentPosition < pumpkinPiConfig.ServoCenter {
+					// Rotate motor right incrementally
+					for i := currentPosition; i <= pumpkinPiConfig.ServoCenter; i++ {
+						log.Debug("pumpkin currently set to left position. setting servo back to center position due to scheduler")
+						time.Sleep(pumpkinPiConfig.ServoRotateDelay)
+						err = servo.Move(i)
+						if err != nil {
+							log.Error(err)
+						}
+					}
+				}
+				currentPosition = pumpkinPiConfig.ServoCenter
+				pumpkinPiConfig.MovingLock = false
 			}
 		})
 	}
