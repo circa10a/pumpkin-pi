@@ -19,8 +19,8 @@ const (
 type PumpkinPiConfig struct {
 	LogLevel           string `envconfig:"LOG_LEVEL" default:"debug"`
 	MotionTimesEnabled bool   `envconfig:"MOTION_TIMES_ENABLED" default:"false"`
-	MotionTimeEnd      int    `envconfig:"MOTION_TIME_END" default:"22"`
-	MotionTimeStart    int    `envconfig:"MOTION_TIME_START" default:"18"`
+	MotionTimeEnd      int    `envconfig:"MOTION_TIME_END" default:"22"`   // 10pm
+	MotionTimeStart    int    `envconfig:"MOTION_TIME_START" default:"17"` // 5pm
 	// Ensure multiple events doesn't jerk motor back and forth with this cheap "lock"
 	MovingLock                  bool
 	ServoCenter                 uint8         `envconfig:"SERVO_CENTER" default:"32"`
@@ -91,24 +91,23 @@ func main() {
 			// If during configured hours
 			if pumpkinPiConfig.isDuringConfiguredHours(time.Now().Hour(), pumpkinPiConfig.MotionTimeStart, pumpkinPiConfig.MotionTimeEnd) {
 				log.Debug("current time is between motion times or motion times are disabled")
-				// Ensure pumpkin is not already moving from another event
-				if pumpkinPiConfig.MovingLock {
+				// If pumpkin is already moving or in the left position, skip
+				if pumpkinPiConfig.MovingLock || currentPosition == pumpkinPiConfig.ServoLeft {
+					log.Debug("pumpkin currently moving or already at left position. skipping move to left")
 					return
 				}
-				if !pumpkinPiConfig.MovingLock {
-					pumpkinPiConfig.MovingLock = true
-					// Rotate motor left incrementally
-					log.Debug("setting servo to left position")
-					for i := currentPosition; i >= pumpkinPiConfig.ServoLeft; i-- {
-						time.Sleep(pumpkinPiConfig.ServoRotateDelay)
-						err = servo.Move(i)
-						if err != nil {
-							log.Error(err)
-						}
-						currentPosition = pumpkinPiConfig.ServoLeft
+				pumpkinPiConfig.MovingLock = true
+				// Rotate motor left incrementally
+				log.Debug("setting servo to left position")
+				for i := currentPosition; i >= pumpkinPiConfig.ServoLeft; i-- {
+					time.Sleep(pumpkinPiConfig.ServoRotateDelay)
+					err = servo.Move(i)
+					if err != nil {
+						log.Error(err)
 					}
-					pumpkinPiConfig.MovingLock = false
+					currentPosition = pumpkinPiConfig.ServoLeft
 				}
+				pumpkinPiConfig.MovingLock = false
 			}
 		})
 		if err != nil {
@@ -120,24 +119,23 @@ func main() {
 			// If during configured hours
 			if pumpkinPiConfig.isDuringConfiguredHours(time.Now().Hour(), pumpkinPiConfig.MotionTimeStart, pumpkinPiConfig.MotionTimeEnd) {
 				log.Debug("current time is between motion times or motion times are disabled")
-				// Ensure pumpkin is not already moving from another event
-				if pumpkinPiConfig.MovingLock {
+				// If pumpkin is already moving or in the right position, skip
+				if pumpkinPiConfig.MovingLock || currentPosition == pumpkinPiConfig.ServoRight {
+					log.Debug("pumpkin currently moving or already at right position. skipping move to right")
 					return
 				}
-				if !pumpkinPiConfig.MovingLock {
-					pumpkinPiConfig.MovingLock = true
-					// Rotate motor right incrementally
-					log.Debug("setting servo to right position")
-					for i := currentPosition; i <= pumpkinPiConfig.ServoRight; i++ {
-						time.Sleep(pumpkinPiConfig.ServoRotateDelay)
-						err = servo.Move(i)
-						if err != nil {
-							log.Error(err)
-						}
-						currentPosition = pumpkinPiConfig.ServoRight
+				pumpkinPiConfig.MovingLock = true
+				// Rotate motor right incrementally
+				log.Debug("setting servo to right position")
+				for i := currentPosition; i <= pumpkinPiConfig.ServoRight; i++ {
+					time.Sleep(pumpkinPiConfig.ServoRotateDelay)
+					err = servo.Move(i)
+					if err != nil {
+						log.Error(err)
 					}
-					pumpkinPiConfig.MovingLock = false
+					currentPosition = pumpkinPiConfig.ServoRight
 				}
+				pumpkinPiConfig.MovingLock = false
 			}
 		})
 		if err != nil {
@@ -152,35 +150,33 @@ func main() {
 				return
 			}
 			// Ensure pumpkin is not already moving from another event
-			if !pumpkinPiConfig.MovingLock {
-				pumpkinPiConfig.MovingLock = true
-				// If motor is in the right position
-				if currentPosition > pumpkinPiConfig.ServoCenter {
-					// Rotate motor left incrementally
-					for i := currentPosition; i >= pumpkinPiConfig.ServoCenter; i-- {
-						log.Debug("pumpkin currently set to right position. setting servo back to center position due to scheduler")
-						time.Sleep(pumpkinPiConfig.ServoRotateDelay)
-						err = servo.Move(i)
-						if err != nil {
-							log.Error(err)
-						}
+			pumpkinPiConfig.MovingLock = true
+			// If motor is in the right position
+			if currentPosition > pumpkinPiConfig.ServoCenter {
+				// Rotate motor left incrementally
+				for i := currentPosition; i >= pumpkinPiConfig.ServoCenter; i-- {
+					log.Debug("pumpkin currently set to right position. setting servo back to center position due to scheduler")
+					time.Sleep(pumpkinPiConfig.ServoRotateDelay)
+					err = servo.Move(i)
+					if err != nil {
+						log.Error(err)
 					}
 				}
-				// If motor is in the left position
-				if currentPosition < pumpkinPiConfig.ServoCenter {
-					// Rotate motor right incrementally
-					for i := currentPosition; i <= pumpkinPiConfig.ServoCenter; i++ {
-						log.Debug("pumpkin currently set to left position. setting servo back to center position due to scheduler")
-						time.Sleep(pumpkinPiConfig.ServoRotateDelay)
-						err = servo.Move(i)
-						if err != nil {
-							log.Error(err)
-						}
-					}
-				}
-				currentPosition = pumpkinPiConfig.ServoCenter
-				pumpkinPiConfig.MovingLock = false
 			}
+			// If motor is in the left position
+			if currentPosition < pumpkinPiConfig.ServoCenter {
+				// Rotate motor right incrementally
+				for i := currentPosition; i <= pumpkinPiConfig.ServoCenter; i++ {
+					log.Debug("pumpkin currently set to left position. setting servo back to center position due to scheduler")
+					time.Sleep(pumpkinPiConfig.ServoRotateDelay)
+					err = servo.Move(i)
+					if err != nil {
+						log.Error(err)
+					}
+				}
+			}
+			currentPosition = pumpkinPiConfig.ServoCenter
+			pumpkinPiConfig.MovingLock = false
 		})
 	}
 	robot := gobot.NewRobot(

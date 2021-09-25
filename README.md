@@ -21,7 +21,7 @@ Inspired by [Ryder Damen's mannequin head](https://www.youtube.com/watch?v=9CVhr
 
 > This project was originally built for outdoor use
 
-[![pumpkin-pi demo](https://yt-embed.herokuapp.com/embed?v=fl52GQJCFVI)](http://www.youtube.com/watch?v=fl52GQJCFVI "pumpkin-pi demo")
+[Youtube link](http://www.youtube.com/watch?v=fl52GQJCFVI)
 
 ## Photos
 
@@ -87,7 +87,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/circa10a/pumpkin-pi/main/i
 | Environment Variable                          | Description                                                                        | Required  | Default  |
 | `PUMPKINPI_LOG_LEVEL`                         | [Logrus](https://github.com/sirupsen/logrus) log level. Use `debug` for more info  | `false`   | `info`   |
 | `PUMPKINPI_MOTION_TIMES_ENABLED`              | Whether to use configured schedule or not. These times must be within the same day | `false`   | `false`  |
-| `PUMPKINPI_MOTION_TIME_START`                 | Local time to ensure pumpkin-pi only responds after this hour                      | `false`   | `18`     |
+| `PUMPKINPI_MOTION_TIME_START`                 | Local time to ensure pumpkin-pi only responds after this hour                      | `false`   | `17`     |
 | `PUMPKINPI_MOTION_TIME_END`                   | Local time to ensure pumpkin-pi only responds before this hour                     | `false`   | `22`     |
 | `PUMPKINPI_PIR_LEFT_MOTION_SENSOR_GPIO_PIN`   | The GPIO Pin used to read inputs from left motion sensor                           | `false`   | `11`     |
 | `PUMPKINPI_PIR_RIGHT_MOTION_SENSOR_GPIO_PIN`  | The GPIO Pin used to read inputs from right motion sensor                          | `false`   | `13`     |
