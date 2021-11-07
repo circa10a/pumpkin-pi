@@ -20,8 +20,7 @@ Inspired by [Ryder Damen's mannequin head](https://www.youtube.com/watch?v=9CVhr
 ## Demo
 
 > This project was originally built for outdoor use
-
-[Youtube link](http://www.youtube.com/watch?v=fl52GQJCFVI)
+[![pumpkin-pi demo](https://yt-embed.herokuapp.com/embed?v=fl52GQJCFVI)](http://www.youtube.com/watch?v=fl52GQJCFVI "pumpkin-pi demo")
 
 ## Photos
 
