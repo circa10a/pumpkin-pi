@@ -90,8 +90,8 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/circa10a/pumpkin-pi/main/i
 | `PUMPKINPI_MOTION_TIME_END`                   | Local time to ensure pumpkin-pi only responds before this hour                     | `false`   | `22`     |
 | `PUMPKINPI_PIR_LEFT_MOTION_SENSOR_GPIO_PIN`   | The GPIO Pin used to read inputs from left motion sensor                           | `false`   | `11`     |
 | `PUMPKINPI_PIR_RIGHT_MOTION_SENSOR_GPIO_PIN`  | The GPIO Pin used to read inputs from right motion sensor                          | `false`   | `13`     |
-| `PUMPKINPI_SERVO_CENTER`                      | The center position of the horizontal servo motor                                  | `false`   | `32`     |
-| `PUMPKINPI_SERVO_LEFT`                        | The left position of the horizontal servo motor                                    | `false`   | `23`     |
+| `PUMPKINPI_SERVO_CENTER`                      | The center position of the horizontal servo motor                                  | `false`   | `29`     |
+| `PUMPKINPI_SERVO_LEFT`                        | The left position of the horizontal servo motor                                    | `false`   | `20`     |
 | `PUMPKINPI_SERVO_RIGHT`                       | The right position of the horizontal servo motor                                   | `false`   | `40`     |
 | `PUMPKINPI_SERVO_ROTATE_DELAY`                | The wait time in between each incremental servo step as it rotates                 | `false`   | `150ms`  |
 | `PUMPKINPI_SERVO_CENTER_RESET_INTERVAL`       | The interval at which the pumpkin will rotate back to the center position          | `false`   | `5m`     |

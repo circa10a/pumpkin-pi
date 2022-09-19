@@ -23,9 +23,9 @@ type PumpkinPiConfig struct {
 	MotionTimeStart    int    `envconfig:"MOTION_TIME_START" default:"17"` // 5pm
 	// Ensure multiple events doesn't jerk motor back and forth with this cheap "lock"
 	MovingLock                  bool
-	ServoCenter                 uint8         `envconfig:"SERVO_CENTER" default:"32"`
+	ServoCenter                 uint8         `envconfig:"SERVO_CENTER" default:"29"`
 	ServoCenterResetInterval    time.Duration `envconfig:"SERVO_CENTER_RESET_INTERVAL" default:"5m"`
-	ServoLeft                   uint8         `envconfig:"SERVO_LEFT" default:"23"`
+	ServoLeft                   uint8         `envconfig:"SERVO_LEFT" default:"20"`
 	ServoRight                  uint8         `envconfig:"SERVO_RIGHT" default:"40"`
 	ServoRotateDelay            time.Duration `envconfig:"SERVO_ROTATE_DELAY" default:"150ms"`
 	ServoGPIOPin                string        `envconfig:"SERVO_GPIO_PIN" default:"12"`
@@ -76,6 +76,7 @@ func main() {
 	rightSensor := gpio.NewPIRMotionDriver(r, pumpkinPiConfig.PIRRightMotionSensorGPIOPin)
 	// Set servo back to center position
 	log.Debug("setting servo to center position")
+
 	err = servo.Move(pumpkinPiConfig.ServoCenter)
 	if err != nil {
 		log.Error(err)
